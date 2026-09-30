@@ -1,56 +1,48 @@
+import { useEffect, useState, type MouseEvent } from 'react';
 import { DemoPanel } from './components/demo/DemoPanel';
-import { ConsentScreen } from './components/phone/ConsentScreen';
-import { HomeScreen } from './components/phone/HomeScreen';
-import { MomentDetail } from './components/phone/MomentDetail';
-import { MomentNotification } from './components/phone/MomentNotification';
-import { PhoneFrame } from './components/phone/PhoneFrame';
-import { TabBar } from './components/phone/TabBar';
-import { TransactionList } from './components/phone/TransactionList';
+import { LivePanel } from './components/live/LivePanel';
+import { PhoneView } from './components/phone/PhoneView';
 import { useDemo } from './hooks/useDemo';
+import { useLive } from './hooks/useLive';
+
+type Mode = 'demo' | 'live';
+
+const modeFromPath = (): Mode => (window.location.pathname.startsWith('/live') ? 'live' : 'demo');
+
+function DemoMode() {
+  const demo = useDemo();
+  return (
+    <main className="stage">
+      <PhoneView state={demo} transitionKey={demo.customerId} />
+      <DemoPanel demo={demo} />
+    </main>
+  );
+}
+
+function LiveMode() {
+  const live = useLive();
+  return (
+    <main className="stage">
+      <PhoneView state={live} transitionKey="live" />
+      <LivePanel live={live} />
+    </main>
+  );
+}
 
 export default function App() {
-  const demo = useDemo();
-  const { customer, consent, activeMoment, screen, setScreen } = demo;
+  const [mode, setMode] = useState<Mode>(modeFromPath);
 
-  let content = <div className="phone-loading" />;
-  if (customer && consent) {
-    switch (screen) {
-      case 'home':
-        content = (
-          <HomeScreen
-            customer={customer}
-            balances={demo.balances}
-            transactions={demo.transactions}
-            newTxIds={demo.newTxIds}
-            moment={activeMoment}
-            response={demo.response}
-            onOpenMoment={demo.openMoment}
-            onSeeAll={() => setScreen('transactions')}
-          />
-        );
-        break;
-      case 'transactions':
-        content = <TransactionList transactions={demo.transactions} newTxIds={demo.newTxIds} />;
-        break;
-      case 'moment':
-        content = (
-          <MomentDetail
-            moment={activeMoment}
-            signals={activeMoment?.signals ?? []}
-            response={demo.response}
-            onRespond={demo.respond}
-            onBack={() => setScreen('home')}
-            onOpenPrivacy={() => setScreen('consent')}
-          />
-        );
-        break;
-      case 'consent':
-        content = (
-          <ConsentScreen categories={demo.consentCategories} consent={consent} onChange={demo.toggleConsent} />
-        );
-        break;
-    }
-  }
+  useEffect(() => {
+    const onPop = () => setMode(modeFromPath());
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  const go = (m: Mode) => (e: MouseEvent) => {
+    e.preventDefault();
+    window.history.pushState(null, '', `/${m}`);
+    setMode(m);
+  };
 
   return (
     <div className="app">
@@ -59,36 +51,19 @@ export default function App() {
           KBC <span>Moments</span>
         </span>
         <span className="app-tagline">Life moment detector · Hackathon proof of concept</span>
-        <span className="app-header-badge">Demo · mock customers · Gemini + fallback</span>
+        <nav className="mode-toggle" aria-label="Mode">
+          <a href="/demo" className={mode === 'demo' ? 'is-active' : ''} onClick={go('demo')}>
+            Demo
+          </a>
+          <a href="/live" className={mode === 'live' ? 'is-active' : ''} onClick={go('live')}>
+            Live
+          </a>
+        </nav>
+        <span className="app-header-badge">
+          {mode === 'demo' ? 'Demo · scripted customers · Gemini + fallback' : 'Live · your data · real Gemini call'}
+        </span>
       </header>
-
-      <main className="stage">
-        <div className="phone-column">
-          <PhoneFrame
-            overlay={
-              <MomentNotification
-                moment={activeMoment}
-                visible={demo.notificationVisible}
-                onOpen={demo.openMoment}
-                onDismiss={demo.dismissNotification}
-              />
-            }
-            tabBar={
-              <TabBar
-                active={screen}
-                onChange={setScreen}
-                momentBadge={!!activeMoment && !demo.response && screen !== 'moment'}
-              />
-            }
-          >
-            <div className="screen-transition" key={`${demo.customerId}-${screen}`}>
-              {content}
-            </div>
-          </PhoneFrame>
-          <p className="phone-caption">What the customer sees</p>
-        </div>
-        <DemoPanel demo={demo} />
-      </main>
+      {mode === 'demo' ? <DemoMode /> : <LiveMode />}
     </div>
   );
 }

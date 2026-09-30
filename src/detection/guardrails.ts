@@ -54,6 +54,11 @@ export interface InterpretRequest {
   demoKey: string;
   summary: BreakSummary;
   consent: ConsentSettings;
+  /** Live mode never falls back silently: without Gemini it errors unless `allowFallback` is set. */
+  mode?: 'demo' | 'live';
+  allowFallback?: boolean;
+  /** Which pre-recorded answer to use when falling back (defaults to demoKey). */
+  fixtureKey?: string;
 }
 
 export interface GuardrailCheck {

@@ -11,6 +11,7 @@ import {
   Wallet,
   Bus,
   Car,
+  CircleDashed,
   FileSignature,
   HeartPulse,
   Home,
@@ -49,6 +50,7 @@ export const categoryIcons: Record<TransactionCategory, LucideIcon> = {
   'pro-equipment': Laptop,
   accounting: Calculator,
   'invoice-income': ReceiptText,
+  other: CircleDashed,
 };
 
 export const momentIcons: Record<ConsentCategoryId, LucideIcon> = {

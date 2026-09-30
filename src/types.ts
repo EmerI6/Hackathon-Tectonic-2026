@@ -22,7 +22,8 @@ export type TransactionCategory =
   | 'business-admin'
   | 'pro-equipment'
   | 'accounting'
-  | 'invoice-income';
+  | 'invoice-income'
+  | 'other';
 
 export interface Transaction {
   id: string;

@@ -64,6 +64,23 @@ npm run lint       # oxlint
 5. Emma (new job), Lucas & Sarah (buying a home) and Marc (retirement) work the same way. Turning a moment type
    off in **Privacy** before simulating shows the consent guardrail; turning it back on releases the notification.
 
+## Live mode (`/live`)
+
+Header toggle **Demo | Live**. Demo mode (`/demo`, default) is the scripted jury story above and is unchanged.
+Live mode has no script: build a customer's history, then run the real pipeline.
+
+1. Enter a first name, age and balances (all kept in this browser's `localStorage`, no database).
+2. Add transactions with the manual form (date, description, amount, income/expense, category) and/or
+   **Import CSV / Excel** (`.csv`, `.xlsx`, `.xls`, parsed in the browser with SheetJS). Columns:
+   `date, description, amount, category` + optional `type` (`income`/`expense`, otherwise the amount's sign).
+   Files: [`public/templates/kbc-moments-template.csv`](public/templates/kbc-moments-template.csv), Julie sample
+   [`.xlsx`](public/templates/julie-sample.xlsx) / [`.csv`](public/templates/julie-sample.csv)
+   (regenerate with `npx tsx scripts/make-samples.ts`). Unknown categories become `other`.
+3. **Analyze**: the last 2 months are compared with the 6 before → `/api/interpret` → Gemini → guardrails → the
+   phone shows the moment. Descriptions never leave the browser: the LLM only sees categories, %, ratios.
+4. Without `GEMINI_API_KEY` (or if Gemini fails) Live mode shows an **error**, never a silent fallback. An opt-in
+   checkbox allows a pre-recorded answer of the closest demo profile, labelled "PRE-RECORDED … not a live analysis".
+
 ## Project structure
 
 ```
@@ -72,7 +89,8 @@ server/
   gemini.ts            Gemini call in JSON mode + response schema
 src/
   detection/           breakDetection, prompt (few-shot), guardrails, catalog, fixtures.json (pre-recorded answers)
-  api/                 Client service layer (customers, consent, moments → /api)
+  api/                 Client service layer (customers, consent, moments → /api, live: import + analyse)
+  components/live/     Live mode panel (profile, import, manual entry, analyse)
   data/mockData.ts     Mock customers with a 6-month baseline + upcoming months (no predefined moments)
   hooks/useDemo.ts     Demo state & pipeline orchestration
   components/          phone/ (customer app) and demo/ (jury panel)
