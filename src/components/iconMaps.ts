@@ -1,0 +1,51 @@
+import {
+  Baby,
+  Banknote,
+  Briefcase,
+  Bus,
+  Car,
+  FileSignature,
+  HeartPulse,
+  Home,
+  PiggyBank,
+  Plug,
+  Shield,
+  ShoppingBag,
+  ShoppingCart,
+  Sunset,
+  Ticket,
+  Truck,
+  Users,
+  UtensilsCrossed,
+  Volleyball,
+  type LucideIcon,
+} from 'lucide-react';
+import type { ConsentCategoryId, TransactionCategory } from '../types';
+
+export const categoryIcons: Record<TransactionCategory, LucideIcon> = {
+  salary: Banknote,
+  groceries: ShoppingCart,
+  restaurant: UtensilsCrossed,
+  transport: Bus,
+  housing: Home,
+  utilities: Plug,
+  shopping: ShoppingBag,
+  'meal-vouchers': Ticket,
+  family: Users,
+  savings: PiggyBank,
+  notary: FileSignature,
+  insurance: Shield,
+  health: HeartPulse,
+  leisure: Volleyball,
+  pension: Sunset,
+};
+
+export const momentIcons: Record<ConsentCategoryId, LucideIcon> = {
+  career: Briefcase,
+  home: Home,
+  moving: Truck,
+  car: Car,
+  retirement: Sunset,
+  family: Baby,
+  health: HeartPulse,
+};
