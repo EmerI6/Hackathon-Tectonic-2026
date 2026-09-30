@@ -66,9 +66,9 @@ export function MomentDetail({ moment, signals, response, onRespond, onBack, onO
         </h2>
         <ul>
           {signals.map((s) => (
-            <li key={s.id}>
+            <li key={s.label}>
               <CircleCheck size={16} />
-              <span>{s.customerExplanation}</span>
+              <span>{s.explanation}</span>
             </li>
           ))}
         </ul>

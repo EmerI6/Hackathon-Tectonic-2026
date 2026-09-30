@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getConsent, getConsentCategories, updateConsent } from '../api/consent';
 import { getCustomer, listCustomers, type CustomerSummary } from '../api/customers';
-import { simulateNextMonth, submitMomentResponse } from '../api/moments';
+import { clearFeedback, listFeedback, reapplyGuardrails, simulateNextMonth, submitMomentResponse } from '../api/moments';
 import type {
   ConsentCategory,
   ConsentCategoryId,
@@ -9,6 +9,7 @@ import type {
   Customer,
   CustomerId,
   Detection,
+  FeedbackEntry,
   MomentResponse,
   Transaction,
 } from '../types';
@@ -17,7 +18,7 @@ export type PhoneScreen = 'home' | 'transactions' | 'moment' | 'consent';
 
 /** 0 Signals · 1 Understanding · 2 Decision · 3 Channel */
 export type PipelineStep = -1 | 0 | 1 | 2 | 3;
-export type PipelineOutcome = 'running' | 'delivered' | 'monitoring' | 'blocked' | null;
+export type PipelineOutcome = 'running' | 'delivered' | 'monitoring' | 'blocked' | 'suppressed' | 'idle' | null;
 
 const STEP_MS = 900;
 
@@ -42,6 +43,7 @@ export function useDemo() {
   const [response, setResponse] = useState<MomentResponse | null>(null);
   const [screen, setScreen] = useState<PhoneScreen>('home');
   const [reloadKey, setReloadKey] = useState(0);
+  const [feedback, setFeedback] = useState<FeedbackEntry[]>([]);
 
   // Guards against a customer switch while an animation is still running.
   const runId = useRef(0);
@@ -49,6 +51,7 @@ export function useDemo() {
   useEffect(() => {
     listCustomers().then(setCustomers);
     getConsentCategories().then(setConsentCategories);
+    listFeedback().then(setFeedback);
   }, []);
 
   useEffect(() => {
@@ -116,21 +119,23 @@ export function useDemo() {
     if (status === 'detected') {
       await deliver(id);
     } else {
-      setPipelineOutcome(status === 'blocked' ? 'blocked' : 'monitoring');
+      setPipelineOutcome(status);
     }
     setSimulating(false);
   }, [customer, consent, simulating, monthIndex, deliver]);
 
   const toggleConsent = useCallback(
     async (category: ConsentCategoryId, enabled: boolean) => {
-      if (!customer) return;
+      if (!customer || !consent) return;
       setConsent((c) => (c ? { ...c, [category]: enabled } : c));
       await updateConsent(customer.id, category, enabled);
 
       // Opting in after a blocked detection releases the moment.
-      if (enabled && detection?.status === 'blocked' && detection.moment.type === category) {
+      if (enabled && detection?.status === 'blocked' && detection.chosen?.category === category) {
         const id = runId.current;
-        setDetection({ ...detection, status: 'detected' });
+        const next = reapplyGuardrails(detection, { ...consent, [category]: true }, customer.firstName);
+        setDetection(next);
+        if (next.status !== 'detected') return;
         setPipelineOutcome('running');
         setPipelineStep(2);
         await wait(STEP_MS);
@@ -138,14 +143,15 @@ export function useDemo() {
         await deliver(id);
       }
     },
-    [customer, detection, deliver],
+    [customer, consent, detection, deliver],
   );
 
   const respond = useCallback(
     async (r: MomentResponse) => {
       if (!customer || !detection) return;
       setResponse(r);
-      await submitMomentResponse(customer.id, detection.moment.id, r);
+      const saved = await submitMomentResponse(detection, r);
+      if (saved) setFeedback((f) => [saved, ...f]);
     },
     [customer, detection],
   );
@@ -156,6 +162,10 @@ export function useDemo() {
   }, []);
 
   const reset = useCallback(() => setReloadKey((k) => k + 1), []);
+  const resetFeedback = useCallback(async () => {
+    await clearFeedback();
+    setFeedback([]);
+  }, []);
   const dismissNotification = useCallback(() => setNotificationVisible(false), []);
 
   const activeMoment = detection?.status === 'detected' ? detection.moment : null;
@@ -186,6 +196,8 @@ export function useDemo() {
     respond,
     openMoment,
     reset,
+    feedback,
+    resetFeedback,
   };
 }
 

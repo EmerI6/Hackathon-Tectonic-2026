@@ -2,6 +2,13 @@ import {
   Baby,
   Banknote,
   Briefcase,
+  Building2,
+  Calculator,
+  Gem,
+  Laptop,
+  ReceiptText,
+  Rocket,
+  Wallet,
   Bus,
   Car,
   FileSignature,
@@ -38,6 +45,10 @@ export const categoryIcons: Record<TransactionCategory, LucideIcon> = {
   health: HeartPulse,
   leisure: Volleyball,
   pension: Sunset,
+  'business-admin': Building2,
+  'pro-equipment': Laptop,
+  accounting: Calculator,
+  'invoice-income': ReceiptText,
 };
 
 export const momentIcons: Record<ConsentCategoryId, LucideIcon> = {
@@ -48,4 +59,7 @@ export const momentIcons: Record<ConsentCategoryId, LucideIcon> = {
   retirement: Sunset,
   family: Baby,
   health: HeartPulse,
+  business: Rocket,
+  wealth: Gem,
+  finances: Wallet,
 };
