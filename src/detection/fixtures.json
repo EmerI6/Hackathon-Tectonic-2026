@@ -1,0 +1,163 @@
+{
+  "emma/2026-10": {
+    "candidates": [
+      {
+        "moment": "Started a new job",
+        "category": "career",
+        "confidence": 91,
+        "signals": [
+          { "label": "New payroll source", "explanation": "Your salary now comes from a new employer.", "source": "Income" },
+          { "label": "Final settlement from previous employer", "explanation": "Your previous employer paid a final settlement and exit holiday pay.", "source": "Transactions" },
+          { "label": "Income up", "explanation": "Your monthly income went up compared with the last six months.", "source": "Income" }
+        ],
+        "customerNeed": "Put part of the raise aside before it disappears into daily spending",
+        "productCategory": "savings-plan",
+        "sensitive": false,
+        "headline": "Congratulations on your new job!",
+        "customerMessage": "Exciting times, Emma! Setting a small part of your higher income aside now is the easiest way to build a safety net without noticing it."
+      }
+    ]
+  },
+  "lucas-sarah/2026-10": {
+    "candidates": [
+      {
+        "moment": "Looking for a home to buy",
+        "category": "home",
+        "confidence": 52,
+        "signals": [
+          { "label": "Building inspection paid", "explanation": "You paid for a pre-purchase building inspection.", "source": "Transactions" },
+          { "label": "Mortgage simulator used", "explanation": "You used the mortgage simulator several times this month.", "source": "In-app behaviour" }
+        ],
+        "customerNeed": "Understand borrowing capacity while searching",
+        "productCategory": "mortgage",
+        "sensitive": false,
+        "headline": "Thinking about buying a home?",
+        "customerMessage": "Looking for a place of your own is exciting. Our guide and simulator can help you see what is possible."
+      }
+    ]
+  },
+  "lucas-sarah/2026-11": {
+    "candidates": [
+      {
+        "moment": "Buying a home",
+        "category": "home",
+        "confidence": 93,
+        "signals": [
+          { "label": "Notary deposit", "explanation": "You made a large payment to a notary office.", "source": "Transactions" },
+          { "label": "Large savings withdrawal", "explanation": "You moved most of your savings to your current account.", "source": "Savings" },
+          { "label": "Building inspection", "explanation": "You paid for a pre-purchase building inspection last month.", "source": "Transactions" },
+          { "label": "Mortgage simulator used", "explanation": "You used the mortgage simulator repeatedly.", "source": "In-app behaviour" }
+        ],
+        "customerNeed": "A mortgage offer and home insurance before signing the deed",
+        "productCategory": "mortgage",
+        "sensitive": false,
+        "headline": "Your new home is getting closer!",
+        "customerMessage": "Signing a sales agreement is a big step, Lucas & Sarah. Let’s make the next one simple: your personal mortgage offer is ready."
+      },
+      {
+        "moment": "Moving house",
+        "category": "moving",
+        "confidence": 55,
+        "signals": [
+          { "label": "Property transaction", "explanation": "A notary payment often comes before a move.", "source": "Transactions" }
+        ],
+        "customerNeed": "Organise the move and new contracts",
+        "productCategory": "home-insurance",
+        "sensitive": false,
+        "headline": "Moving soon?",
+        "customerMessage": "A move brings a lot of paperwork. We can help with your new home insurance."
+      }
+    ]
+  },
+  "marc/2026-10": {
+    "candidates": [
+      {
+        "moment": "Winding down towards retirement",
+        "category": "retirement",
+        "confidence": 58,
+        "signals": [
+          { "label": "Salary reduced", "explanation": "Your salary decreased compared with the last six months.", "source": "Income" },
+          { "label": "Pension planner visits", "explanation": "You opened the pension planner in the app several times.", "source": "In-app behaviour" },
+          { "label": "Age bracket", "explanation": "You are getting close to the legal pension age.", "source": "Profile" }
+        ],
+        "customerNeed": "Understand the income gap once retired",
+        "productCategory": "retirement-planning",
+        "sensitive": false,
+        "headline": "Your retirement is coming into view",
+        "customerMessage": "A clear plan now helps you keep your lifestyle later. Our pension planner shows your options."
+      }
+    ]
+  },
+  "marc/2026-11": {
+    "candidates": [
+      {
+        "moment": "Preparing for retirement",
+        "category": "retirement",
+        "confidence": 87,
+        "signals": [
+          { "label": "End-of-career salary cut", "explanation": "Your salary went down, in line with an end-of-career scheme.", "source": "Income" },
+          { "label": "Supplementary pension payout planned", "explanation": "Your group insurance announced a pension payout.", "source": "Transactions" },
+          { "label": "Pension planner visits", "explanation": "You opened the pension planner in the app several times.", "source": "In-app behaviour" },
+          { "label": "Age bracket", "explanation": "You are close to the legal pension age.", "source": "Profile" }
+        ],
+        "customerNeed": "Turn savings and the pension payout into a steady monthly income",
+        "productCategory": "retirement-planning",
+        "sensitive": false,
+        "headline": "Your retirement is coming into view",
+        "customerMessage": "You’ve worked hard for this, Marc. With a clear plan, your savings can become a comfortable extra monthly income from day one of your retirement."
+      }
+    ]
+  },
+  "julie/2026-10": {
+    "candidates": [
+      {
+        "moment": "Starting a side activity as self-employed",
+        "category": "business",
+        "confidence": 58,
+        "signals": [
+          { "label": "Business registration fee", "explanation": "You paid an enterprise counter, which usually means registering a business.", "source": "Transactions" },
+          { "label": "New accountant", "explanation": "You started paying an accountant.", "source": "Transactions" },
+          { "label": "First invoice income", "explanation": "You received a first payment from a client.", "source": "Income" }
+        ],
+        "customerNeed": "Keep private and professional money apart from the start",
+        "productCategory": "professional-account",
+        "sensitive": false,
+        "headline": "Starting something of your own?",
+        "customerMessage": "It looks like you may be launching an activity. Our self-employed guide explains the first steps."
+      }
+    ]
+  },
+  "julie/2026-11": {
+    "candidates": [
+      {
+        "moment": "Becoming self-employed",
+        "category": "business",
+        "confidence": 86,
+        "signals": [
+          { "label": "Salary stopped, invoice income started", "explanation": "Your salary stopped and you now receive payments from several clients.", "source": "Income" },
+          { "label": "Business set-up costs", "explanation": "You registered a business, pay social contributions and an accountant.", "source": "Transactions" },
+          { "label": "Professional equipment", "explanation": "You bought professional equipment and rent a coworking desk.", "source": "Transactions" },
+          { "label": "Irregular income, savings paused", "explanation": "Your income now varies from month to month and your monthly savings transfer stopped.", "source": "Savings" }
+        ],
+        "customerNeed": "A separate professional account, a buffer for irregular income and a self-employed pension",
+        "productCategory": "professional-account",
+        "sensitive": false,
+        "headline": "Congrats on going independent!",
+        "customerMessage": "Launching your own business is a big step, Julie. Keeping private and professional money apart from day one makes taxes and budgeting much easier."
+      },
+      {
+        "moment": "Income becoming irregular",
+        "category": "finances",
+        "confidence": 38,
+        "signals": [
+          { "label": "Savings transfer stopped", "explanation": "Your monthly savings transfer stopped.", "source": "Savings" }
+        ],
+        "customerNeed": "Budget visibility during a transition",
+        "productCategory": "budget-coaching",
+        "sensitive": true,
+        "headline": "A clear view on your budget",
+        "customerMessage": "Changes in income are normal during a transition. A budget overview can help."
+      }
+    ]
+  }
+}

@@ -2,16 +2,11 @@
  * Hardcoded demo data for the KBC Moments proof of concept.
  *
  * All names (employers, merchants, notaries...) are fictional.
- * Nothing in the UI imports this file directly: go through `src/api/*`
- * so this module can be replaced by real API calls later.
+ * There are no predefined moments: the break detector + LLM infer them.
+ * Nothing in the UI imports this file directly: go through `src/api/*`.
  */
-import type {
-  ConsentCategory,
-  ConsentSettings,
-  Customer,
-  Transaction,
-  TransactionCategory,
-} from '../types';
+import { SENSITIVE_CATEGORIES } from '../detection/guardrails.ts';
+import type { ConsentCategory, ConsentSettings, Customer, MonthData, Transaction, TransactionCategory } from '../types';
 
 let seq = 0;
 function tx(
@@ -25,73 +20,49 @@ function tx(
   return { id: `tx-${seq}`, date, merchant, category, amount, ...extra };
 }
 
+const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const BASELINE = ['04', '05', '06', '07', '08', '09'];
+
+function month(mm: string, transactions: Transaction[], extra: Partial<MonthData> = {}): MonthData {
+  return { key: `2026-${mm}`, label: MONTH_LABELS[Number(mm) - 1], transactions, ...extra };
+}
+
+const PAYROLL = 'payroll · employer';
+const RENT = 'rent · landlord';
+
 export const consentCategories: ConsentCategory[] = [
-  {
-    id: 'career',
-    label: 'New job & income changes',
-    description: 'Salary changes, a new employer or a first job.',
-    sensitive: false,
-  },
-  {
-    id: 'home',
-    label: 'Buying or renovating a home',
-    description: 'Notary payments, mortgage simulations, renovation costs.',
-    sensitive: false,
-  },
-  {
-    id: 'moving',
-    label: 'Moving house',
-    description: 'A new address, new utility contracts or rent payments.',
-    sensitive: false,
-  },
-  {
-    id: 'car',
-    label: 'Buying a car',
-    description: 'Car dealer payments, leasing or vehicle registration.',
-    sensitive: false,
-  },
-  {
-    id: 'retirement',
-    label: 'Preparing for retirement',
-    description: 'End-of-career schemes, pension planning and savings.',
-    sensitive: false,
-  },
-  {
-    id: 'family',
-    label: 'Family & new baby',
-    description: 'Birth allowances, childcare and maternity-related spending.',
-    sensitive: true,
-  },
-  {
-    id: 'health',
-    label: 'Health & care',
-    description: 'Hospital, pharmacy and care-related payments.',
-    sensitive: true,
-  },
+  { id: 'career', label: 'New job & income changes', description: 'Salary changes, a new employer or a first job.', sensitive: false },
+  { id: 'business', label: 'Starting a business', description: 'Becoming self-employed or launching a company.', sensitive: false },
+  { id: 'home', label: 'Buying or renovating a home', description: 'Notary payments, mortgage simulations, renovation costs.', sensitive: false },
+  { id: 'moving', label: 'Moving house', description: 'A new address, new utility contracts or rent payments.', sensitive: false },
+  { id: 'car', label: 'Buying a car', description: 'Car dealer payments, leasing or vehicle registration.', sensitive: false },
+  { id: 'retirement', label: 'Preparing for retirement', description: 'End-of-career schemes, pension planning and savings.', sensitive: false },
+  { id: 'wealth', label: 'Large amounts & inheritance', description: 'An inheritance, a bonus or another exceptional income.', sensitive: false },
+  { id: 'family', label: 'Family, baby & separation', description: 'Birth allowances, childcare, changes in household.', sensitive: true },
+  { id: 'health', label: 'Health & care', description: 'Hospital, pharmacy and care-related payments.', sensitive: true },
+  { id: 'finances', label: 'Financial difficulty', description: 'Signs that making ends meet gets harder.', sensitive: true },
 ];
 
 /** Sensitive moments are OFF until the customer explicitly opts in. */
 export const defaultConsent: ConsentSettings = consentCategories.reduce(
-  (acc, c) => ({ ...acc, [c.id]: !c.sensitive }),
+  (acc, c) => ({ ...acc, [c.id]: !SENSITIVE_CATEGORIES.includes(c.id) }),
   {} as ConsentSettings,
 );
 
 /* ------------------------------------------------------------------ */
-/* Emma, 27 — new job                                                  */
+/* Emma, 27                                                            */
 /* ------------------------------------------------------------------ */
 
-function emmaMonth(month: string): Transaction[] {
+function emmaMonth(m: string): Transaction[] {
   return [
-    tx(`2026-${month}-28`, 'Brusselia Retail NV', 'salary', 2450, { description: 'Salary' }),
-    tx(`2026-${month}-26`, 'FreshMarkt Ixelles', 'groceries', -64.3),
-    tx(`2026-${month}-22`, 'Café De Kroon', 'restaurant', -18.5),
-    tx(`2026-${month}-15`, 'TelNet Belgium', 'utilities', -39.99, { description: 'Mobile & internet' }),
-    tx(`2026-${month}-08`, 'FreshMarkt Ixelles', 'groceries', -52.1),
-    tx(`2026-${month}-03`, 'MealCard Benelux', 'meal-vouchers', 176, {
-      description: 'Meal vouchers · Brusselia Retail',
-    }),
-    tx(`2026-${month}-02`, 'BrusselsMove', 'transport', -49, { description: 'Monthly transit pass' }),
-    tx(`2026-${month}-01`, 'Immo Louise', 'housing', -875, { description: 'Rent' }),
+    tx(`2026-${m}-28`, 'Brusselia Retail NV', 'salary', 2450, { description: 'Salary', kind: PAYROLL }),
+    tx(`2026-${m}-26`, 'FreshMarkt Ixelles', 'groceries', -64.3, { kind: 'supermarket' }),
+    tx(`2026-${m}-22`, 'Café De Kroon', 'restaurant', -18.5, { kind: 'café' }),
+    tx(`2026-${m}-15`, 'TelNet Belgium', 'utilities', -39.99, { description: 'Mobile & internet', kind: 'telecom' }),
+    tx(`2026-${m}-08`, 'FreshMarkt Ixelles', 'groceries', -52.1, { kind: 'supermarket' }),
+    tx(`2026-${m}-03`, 'MealCard Benelux', 'meal-vouchers', 176, { description: 'Meal vouchers · Brusselia Retail', kind: 'meal vouchers' }),
+    tx(`2026-${m}-02`, 'BrusselsMove', 'transport', -49, { description: 'Monthly transit pass', kind: 'public transport pass' }),
+    tx(`2026-${m}-01`, 'Immo Louise', 'housing', -875, { description: 'Rent', kind: RENT }),
   ];
 }
 
@@ -100,99 +71,41 @@ const emma: Customer = {
   firstName: 'Emma',
   displayName: 'Emma Janssens',
   age: 27,
-  persona: 'Just started a new job',
+  persona: 'Salaried, stable for months',
   city: 'Ixelles, Brussels',
   avatarColor: '#00AEEF',
   balances: { current: 1842.35, savings: 3250 },
-  history: [
-    { key: '2026-07', label: 'Jul', transactions: emmaMonth('07'), },
-    { key: '2026-08', label: 'Aug', transactions: emmaMonth('08'), },
-    { key: '2026-09', label: 'Sep', transactions: emmaMonth('09'), },
-  ],
+  history: BASELINE.map((m) => month(m, emmaMonth(m))),
   upcoming: [
-    {
-      key: '2026-10',
-      label: 'Oct',
-      unlocksSignals: ['emma-new-employer', 'emma-salary-stopped', 'emma-income-up'],
-      transactions: [
-        tx('2026-10-30', 'Lumen Analytics BV', 'salary', 2850, {
-          description: 'Salary · first payment',
-          signal: { label: 'New employer' },
-        }),
-        tx('2026-10-24', 'Frituur ’t Hoekske', 'restaurant', -14.8),
-        tx('2026-10-20', 'FreshMarkt Ixelles', 'groceries', -71.25),
-        tx('2026-10-15', 'TelNet Belgium', 'utilities', -39.99, { description: 'Mobile & internet' }),
-        tx('2026-10-06', 'Brusselia Retail NV', 'salary', 1124.6, {
-          description: 'Final settlement & exit holiday pay',
-          signal: { label: 'Previous salary stopped' },
-        }),
-        tx('2026-10-03', 'MealCard Benelux', 'meal-vouchers', 220, {
-          description: 'Meal vouchers · Lumen Analytics',
-          signal: { label: 'New employer' },
-        }),
-        tx('2026-10-02', 'BrusselsMove', 'transport', -49, { description: 'Monthly transit pass' }),
-        tx('2026-10-01', 'Immo Louise', 'housing', -875, { description: 'Rent' }),
-      ],
-    },
+    month('10', [
+      tx('2026-10-30', 'Lumen Analytics BV', 'salary', 2850, { description: 'Salary · first payment', kind: PAYROLL }),
+      tx('2026-10-24', 'Frituur ’t Hoekske', 'restaurant', -14.8, { kind: 'café' }),
+      tx('2026-10-20', 'FreshMarkt Ixelles', 'groceries', -71.25, { kind: 'supermarket' }),
+      tx('2026-10-15', 'TelNet Belgium', 'utilities', -39.99, { description: 'Mobile & internet', kind: 'telecom' }),
+      tx('2026-10-06', 'Brusselia Retail NV', 'salary', 1124.6, {
+        description: 'Final settlement & exit holiday pay',
+        kind: 'payroll · final settlement & exit holiday pay',
+      }),
+      tx('2026-10-03', 'MealCard Benelux', 'meal-vouchers', 220, { description: 'Meal vouchers · Lumen Analytics', kind: 'meal vouchers' }),
+      tx('2026-10-02', 'BrusselsMove', 'transport', -49, { description: 'Monthly transit pass', kind: 'public transport pass' }),
+      tx('2026-10-01', 'Immo Louise', 'housing', -875, { description: 'Rent', kind: RENT }),
+    ]),
   ],
-  moment: {
-    id: 'moment-emma-new-job',
-    type: 'career',
-    title: 'New job',
-    headline: 'Congratulations on your new job!',
-    message:
-      'Exciting times, Emma! Your income went up by €400 a month. Setting a little aside now is the easiest way to build a safety net without even noticing it.',
-    notification: 'Congratulations on your new job, Emma! We have a small tip to make the most of it.',
-    threshold: 75,
-    channel: 'Push notification · KBC Mobile',
-    signals: [
-      {
-        id: 'emma-new-employer',
-        label: 'New employer salary',
-        customerExplanation: 'Your salary now comes from a new employer, Lumen Analytics.',
-        source: 'Income',
-        weight: 40,
-      },
-      {
-        id: 'emma-salary-stopped',
-        label: 'Previous salary stopped',
-        customerExplanation: 'Brusselia Retail paid a final settlement instead of your usual salary.',
-        source: 'Transactions',
-        weight: 30,
-      },
-      {
-        id: 'emma-income-up',
-        label: 'Income change',
-        customerExplanation: 'Your monthly income increased by €400.',
-        source: 'Income',
-        weight: 22,
-      },
-    ],
-    recommendation: {
-      id: 'rec-emma-autosave',
-      title: 'Save €100 automatically every month',
-      description:
-        'A monthly transfer to your savings account on payday. That is €1,200 extra in a year — and you can pause it anytime.',
-      ctaLabel: 'Start saving €100/month',
-      confirmation: 'Done! €100 will move to your savings account on the 1st of every month.',
-      product: 'Automatic savings plan',
-    },
-  },
 };
 
 /* ------------------------------------------------------------------ */
-/* Lucas & Sarah, 32 — buying a house                                  */
+/* Lucas & Sarah, 32                                                   */
 /* ------------------------------------------------------------------ */
 
-function lucasSarahMonth(month: string): Transaction[] {
+function lucasSarahMonth(m: string): Transaction[] {
   return [
-    tx(`2026-${month}-28`, 'Vandenbroeck Engineering NV', 'salary', 3120, { description: 'Salary · Lucas' }),
-    tx(`2026-${month}-27`, 'AZ Sint-Rombout', 'salary', 2780, { description: 'Salary · Sarah' }),
-    tx(`2026-${month}-21`, 'Marché Frais Mechelen', 'groceries', -118.4),
-    tx(`2026-${month}-12`, 'Groeipakket', 'family', 181.02, { description: 'Family allowance' }),
-    tx(`2026-${month}-10`, 'Kinderdagverblijf Het Bijtje', 'family', -420, { description: 'Daycare' }),
-    tx(`2026-${month}-05`, 'MealCard Benelux', 'meal-vouchers', 352, { description: 'Meal vouchers' }),
-    tx(`2026-${month}-01`, 'Residentie Dijle', 'housing', -1150, { description: 'Rent' }),
+    tx(`2026-${m}-28`, 'Vandenbroeck Engineering NV', 'salary', 3120, { description: 'Salary · Lucas', kind: PAYROLL }),
+    tx(`2026-${m}-27`, 'AZ Sint-Rombout', 'salary', 2780, { description: 'Salary · Sarah', kind: PAYROLL }),
+    tx(`2026-${m}-21`, 'Marché Frais Mechelen', 'groceries', -118.4, { kind: 'supermarket' }),
+    tx(`2026-${m}-12`, 'Groeipakket', 'family', 181.02, { description: 'Family allowance', kind: 'family allowance fund' }),
+    tx(`2026-${m}-10`, 'Kinderdagverblijf Het Bijtje', 'family', -420, { description: 'Daycare', kind: 'daycare' }),
+    tx(`2026-${m}-05`, 'MealCard Benelux', 'meal-vouchers', 352, { description: 'Meal vouchers', kind: 'meal vouchers' }),
+    tx(`2026-${m}-01`, 'Residentie Dijle', 'housing', -1150, { description: 'Rent', kind: RENT }),
   ];
 }
 
@@ -201,116 +114,62 @@ const lucasSarah: Customer = {
   firstName: 'Lucas & Sarah',
   displayName: 'Lucas & Sarah Peeters',
   age: 32,
-  persona: 'Buying their first house',
+  persona: 'Young family, renting',
   city: 'Mechelen',
   avatarColor: '#7B61FF',
   balances: { current: 4320.18, savings: 38540 },
-  history: [
-    { key: '2026-08', label: 'Aug', transactions: lucasSarahMonth('08'), },
-    { key: '2026-09', label: 'Sep', transactions: lucasSarahMonth('09'), },
-  ],
+  history: BASELINE.map((m) => month(m, lucasSarahMonth(m))),
   upcoming: [
-    {
-      key: '2026-10',
-      label: 'Oct',
-      unlocksSignals: ['ls-simulator', 'ls-inspection'],
-      transactions: [
-        tx('2026-10-28', 'Vandenbroeck Engineering NV', 'salary', 3120, { description: 'Salary · Lucas' }),
-        tx('2026-10-27', 'AZ Sint-Rombout', 'salary', 2780, { description: 'Salary · Sarah' }),
+    month(
+      '10',
+      [
+        tx('2026-10-28', 'Vandenbroeck Engineering NV', 'salary', 3120, { description: 'Salary · Lucas', kind: PAYROLL }),
+        tx('2026-10-27', 'AZ Sint-Rombout', 'salary', 2780, { description: 'Salary · Sarah', kind: PAYROLL }),
         tx('2026-10-18', 'Bouwkeuring Mertens BV', 'housing', -350, {
           description: 'Pre-purchase building inspection',
-          signal: { label: 'Home purchase' },
+          kind: 'building inspection',
         }),
-        tx('2026-10-12', 'Groeipakket', 'family', 181.02, { description: 'Family allowance' }),
-        tx('2026-10-10', 'Kinderdagverblijf Het Bijtje', 'family', -420, { description: 'Daycare' }),
-        tx('2026-10-01', 'Residentie Dijle', 'housing', -1150, { description: 'Rent' }),
+        tx('2026-10-12', 'Groeipakket', 'family', 181.02, { description: 'Family allowance', kind: 'family allowance fund' }),
+        tx('2026-10-10', 'Kinderdagverblijf Het Bijtje', 'family', -420, { description: 'Daycare', kind: 'daycare' }),
+        tx('2026-10-05', 'MealCard Benelux', 'meal-vouchers', 352, { description: 'Meal vouchers', kind: 'meal vouchers' }),
+        tx('2026-10-01', 'Residentie Dijle', 'housing', -1150, { description: 'Rent', kind: RENT }),
       ],
-    },
-    {
-      key: '2026-11',
-      label: 'Nov',
-      savingsDelta: -32000,
-      unlocksSignals: ['ls-notary', 'ls-savings'],
-      transactions: [
-        tx('2026-11-27', 'Vandenbroeck Engineering NV', 'salary', 3120, { description: 'Salary · Lucas' }),
-        tx('2026-11-26', 'AZ Sint-Rombout', 'salary', 2780, { description: 'Salary · Sarah' }),
+      { appEvents: [{ feature: 'mortgage simulator', count: 4 }] },
+    ),
+    month(
+      '11',
+      [
+        tx('2026-11-27', 'Vandenbroeck Engineering NV', 'salary', 3120, { description: 'Salary · Lucas', kind: PAYROLL }),
+        tx('2026-11-26', 'AZ Sint-Rombout', 'salary', 2780, { description: 'Salary · Sarah', kind: PAYROLL }),
         tx('2026-11-14', 'Notariskantoor Peeters & De Smet', 'notary', -32000, {
           description: '10% deposit · sales agreement',
-          signal: { label: 'Notary payment' },
+          kind: 'notary office',
         }),
         tx('2026-11-13', 'Transfer from savings', 'savings', 32000, {
           description: 'From savings account',
-          signal: { label: 'Large savings withdrawal' },
+          kind: 'transfer from own savings account',
         }),
-        tx('2026-11-12', 'Groeipakket', 'family', 181.02, { description: 'Family allowance' }),
-        tx('2026-11-01', 'Residentie Dijle', 'housing', -1150, { description: 'Rent' }),
+        tx('2026-11-12', 'Groeipakket', 'family', 181.02, { description: 'Family allowance', kind: 'family allowance fund' }),
+        tx('2026-11-05', 'MealCard Benelux', 'meal-vouchers', 352, { description: 'Meal vouchers', kind: 'meal vouchers' }),
+        tx('2026-11-01', 'Residentie Dijle', 'housing', -1150, { description: 'Rent', kind: RENT }),
       ],
-    },
+      { savingsDelta: -32000, appEvents: [{ feature: 'mortgage simulator', count: 2 }] },
+    ),
   ],
-  moment: {
-    id: 'moment-ls-home',
-    type: 'home',
-    title: 'Buying a home',
-    headline: 'Your new home is getting closer!',
-    message:
-      'Signing a sales agreement is a big step, Lucas & Sarah. Let’s make the next one simple: your personal mortgage offer is ready to review.',
-    notification: 'Big step, Lucas & Sarah! Your personal mortgage offer is ready.',
-    threshold: 75,
-    channel: 'Push notification + advisor follow-up',
-    signals: [
-      {
-        id: 'ls-notary',
-        label: 'Notary deposit payment',
-        customerExplanation: 'You paid a €32,000 deposit to a notary office.',
-        source: 'Transactions',
-        weight: 35,
-      },
-      {
-        id: 'ls-simulator',
-        label: 'Mortgage simulator used',
-        customerExplanation: 'You used the mortgage simulator in the app 4 times this month.',
-        source: 'In-app behaviour',
-        weight: 25,
-      },
-      {
-        id: 'ls-inspection',
-        label: 'Building inspection',
-        customerExplanation: 'You paid for a pre-purchase building inspection.',
-        source: 'Transactions',
-        weight: 15,
-      },
-      {
-        id: 'ls-savings',
-        label: 'Large savings withdrawal',
-        customerExplanation: 'You moved €32,000 from your savings account.',
-        source: 'Savings',
-        weight: 13,
-      },
-    ],
-    recommendation: {
-      id: 'rec-ls-mortgage',
-      title: 'Get your personal mortgage offer',
-      description:
-        '€288,000 over 25 years, from €1,295/month. Includes the home insurance you need at signing.',
-      ctaLabel: 'View my mortgage offer',
-      confirmation: 'Your offer is saved. A home-loan expert will confirm it within 24 hours.',
-      product: 'Home loan + home insurance',
-    },
-  },
 };
 
 /* ------------------------------------------------------------------ */
-/* Marc, 63 — approaching retirement                                   */
+/* Marc, 63                                                            */
 /* ------------------------------------------------------------------ */
 
-function marcMonth(month: string): Transaction[] {
+function marcMonth(m: string): Transaction[] {
   return [
-    tx(`2026-${month}-28`, 'Brabant Logistics NV', 'salary', 3640, { description: 'Salary' }),
-    tx(`2026-${month}-24`, 'Tennisclub Heverlee', 'leisure', -45),
-    tx(`2026-${month}-19`, 'Marché Frais Leuven', 'groceries', -96.7),
-    tx(`2026-${month}-15`, 'Pension savings plan', 'pension', -85, { description: 'Monthly contribution' }),
-    tx(`2026-${month}-09`, 'Stroom Energie', 'utilities', -132, { description: 'Gas & electricity' }),
-    tx(`2026-${month}-04`, 'Restaurant De Molen', 'restaurant', -68),
+    tx(`2026-${m}-28`, 'Brabant Logistics NV', 'salary', 3640, { description: 'Salary', kind: PAYROLL }),
+    tx(`2026-${m}-24`, 'Tennisclub Heverlee', 'leisure', -45, { kind: 'sports club' }),
+    tx(`2026-${m}-19`, 'Marché Frais Leuven', 'groceries', -96.7, { kind: 'supermarket' }),
+    tx(`2026-${m}-15`, 'Pension savings plan', 'pension', -85, { description: 'Monthly contribution', kind: 'pension savings contribution' }),
+    tx(`2026-${m}-09`, 'Stroom Energie', 'utilities', -132, { description: 'Gas & electricity', kind: 'energy supplier' }),
+    tx(`2026-${m}-04`, 'Restaurant De Molen', 'restaurant', -68, { kind: 'restaurant' }),
   ];
 }
 
@@ -319,98 +178,103 @@ const marc: Customer = {
   firstName: 'Marc',
   displayName: 'Marc Dubois',
   age: 63,
-  persona: 'Approaching retirement',
+  persona: 'Long career, same employer',
   city: 'Leuven',
   avatarColor: '#F5A623',
   balances: { current: 6780.4, savings: 72300 },
-  history: [
-    { key: '2026-08', label: 'Aug', transactions: marcMonth('08'), },
-    { key: '2026-09', label: 'Sep', transactions: marcMonth('09'), },
-  ],
+  history: BASELINE.map((m) => month(m, marcMonth(m))),
   upcoming: [
-    {
-      key: '2026-10',
-      label: 'Oct',
-      unlocksSignals: ['marc-salary', 'marc-planner'],
-      transactions: [
-        tx('2026-10-28', 'Brabant Logistics NV', 'salary', 2980, {
-          description: 'Salary · 4/5 end-of-career scheme',
-          signal: { label: 'Salary decreased' },
-        }),
-        tx('2026-10-24', 'Tennisclub Heverlee', 'leisure', -45),
-        tx('2026-10-15', 'Pension savings plan', 'pension', -85, { description: 'Monthly contribution' }),
-        tx('2026-10-09', 'Stroom Energie', 'utilities', -132, { description: 'Gas & electricity' }),
-        tx('2026-10-05', 'Marché Frais Leuven', 'groceries', -88.7),
+    month(
+      '10',
+      [
+        tx('2026-10-28', 'Brabant Logistics NV', 'salary', 2980, { description: 'Salary · 4/5 end-of-career scheme', kind: PAYROLL }),
+        tx('2026-10-24', 'Tennisclub Heverlee', 'leisure', -45, { kind: 'sports club' }),
+        tx('2026-10-15', 'Pension savings plan', 'pension', -85, { description: 'Monthly contribution', kind: 'pension savings contribution' }),
+        tx('2026-10-09', 'Stroom Energie', 'utilities', -132, { description: 'Gas & electricity', kind: 'energy supplier' }),
+        tx('2026-10-05', 'Marché Frais Leuven', 'groceries', -88.7, { kind: 'supermarket' }),
       ],
-    },
-    {
-      key: '2026-11',
-      label: 'Nov',
-      unlocksSignals: ['marc-group-insurance', 'marc-age'],
-      transactions: [
-        tx('2026-11-28', 'Brabant Logistics NV', 'salary', 2980, {
-          description: 'Salary · 4/5 end-of-career scheme',
-        }),
-        tx('2026-11-20', 'Fidelia Group Insurance', 'insurance', 0, {
+      { appEvents: [{ feature: 'pension planner', count: 3 }] },
+    ),
+    month(
+      '11',
+      [
+        tx('2026-11-28', 'Brabant Logistics NV', 'salary', 2980, { description: 'Salary · 4/5 end-of-career scheme', kind: PAYROLL }),
+        tx('2026-11-20', 'Fidelia Group Insurance', 'pension', 0, {
           description: 'Statement: supplementary pension payout 2028',
-          signal: { label: 'Pension payout planned' },
+          kind: 'group insurance statement · supplementary pension payout planned',
         }),
-        tx('2026-11-15', 'Pension savings plan', 'pension', -85, { description: 'Monthly contribution' }),
-        tx('2026-11-09', 'Stroom Energie', 'utilities', -132, { description: 'Gas & electricity' }),
-        tx('2026-11-03', 'Travel Horizon', 'leisure', -123, { description: 'Travel brochure & booking fee' }),
+        tx('2026-11-15', 'Pension savings plan', 'pension', -85, { description: 'Monthly contribution', kind: 'pension savings contribution' }),
+        tx('2026-11-09', 'Stroom Energie', 'utilities', -132, { description: 'Gas & electricity', kind: 'energy supplier' }),
+        tx('2026-11-03', 'Travel Horizon', 'leisure', -123, { description: 'Travel brochure & booking fee', kind: 'travel agency' }),
       ],
-    },
+      { appEvents: [{ feature: 'pension planner', count: 2 }] },
+    ),
   ],
-  moment: {
-    id: 'moment-marc-retirement',
-    type: 'retirement',
-    title: 'Preparing for retirement',
-    headline: 'Your retirement is coming into view',
-    message:
-      'You’ve worked hard for this, Marc. With a clear plan, your savings can turn into a comfortable extra monthly income from day one of your retirement.',
-    notification: 'Marc, let’s turn your savings into a steady retirement income.',
-    threshold: 75,
-    channel: 'In-app message + advisor call',
-    signals: [
-      {
-        id: 'marc-salary',
-        label: 'Salary reduced to 4/5',
-        customerExplanation: 'Your salary decreased by 18%, in line with an end-of-career scheme.',
-        source: 'Income',
-        weight: 30,
-      },
-      {
-        id: 'marc-planner',
-        label: 'Pension planner visits',
-        customerExplanation: 'You opened the pension planner in the app 3 times.',
-        source: 'In-app behaviour',
-        weight: 25,
-      },
-      {
-        id: 'marc-group-insurance',
-        label: 'Group insurance payout 2028',
-        customerExplanation: 'Your employer’s group insurance plans a payout in 2028.',
-        source: 'Transactions',
-        weight: 18,
-      },
-      {
-        id: 'marc-age',
-        label: 'Close to legal pension age',
-        customerExplanation: 'You are 2 years away from the legal pension age.',
-        source: 'Profile',
-        weight: 12,
-      },
-    ],
-    recommendation: {
-      id: 'rec-marc-plan',
-      title: 'Start your retirement income plan',
-      description:
-        'Move €20,000 of savings into a low-risk retirement portfolio: about €310 extra per month from 2028.',
-      ctaLabel: 'Start my retirement plan',
-      confirmation: 'Your plan is set up. You will find your projected monthly income under Investments.',
-      product: 'Retirement income portfolio',
-    },
-  },
 };
 
-export const customers: Customer[] = [emma, lucasSarah, marc];
+/* ------------------------------------------------------------------ */
+/* Julie, 34 — nothing predefined: the detector has to find it          */
+/* ------------------------------------------------------------------ */
+
+function julieMonth(m: string): Transaction[] {
+  return [
+    tx(`2026-${m}-28`, 'Studio Pixel SRL', 'salary', 2600, { description: 'Salary', kind: PAYROLL }),
+    tx(`2026-${m}-25`, 'Delhaize Namur', 'groceries', -82.4, { kind: 'supermarket' }),
+    tx(`2026-${m}-20`, 'Le Comptoir', 'restaurant', -24, { kind: 'restaurant' }),
+    tx(`2026-${m}-15`, 'Proximus', 'utilities', -45, { description: 'Mobile & internet', kind: 'telecom' }),
+    tx(`2026-${m}-05`, 'Savings account', 'savings', -300, { description: 'Monthly transfer to savings', kind: 'transfer to own savings account' }),
+    tx(`2026-${m}-03`, 'Edenred', 'meal-vouchers', 160, { description: 'Meal vouchers', kind: 'meal vouchers' }),
+    tx(`2026-${m}-02`, 'TEC', 'transport', -42, { description: 'Monthly bus pass', kind: 'public transport pass' }),
+    tx(`2026-${m}-01`, 'Résidence Meuse', 'housing', -820, { description: 'Rent', kind: RENT }),
+  ];
+}
+
+const julie: Customer = {
+  id: 'julie',
+  firstName: 'Julie',
+  displayName: 'Julie Lambert',
+  age: 34,
+  persona: 'Graphic designer, salaried',
+  city: 'Namur',
+  avatarColor: '#E5487F',
+  balances: { current: 3120.6, savings: 14800 },
+  history: BASELINE.map((m) => month(m, julieMonth(m))),
+  upcoming: [
+    month('10', [
+      tx('2026-10-28', 'Studio Pixel SRL', 'salary', 2600, { description: 'Salary', kind: PAYROLL }),
+      tx('2026-10-24', 'Atelier Moreau', 'invoice-income', 650, {
+        description: 'Invoice 2026-001',
+        kind: 'client transfer · invoice payment',
+      }),
+      tx('2026-10-22', 'Delhaize Namur', 'groceries', -79.9, { kind: 'supermarket' }),
+      tx('2026-10-16', 'Fiduciaire Collard', 'accounting', -150, { description: 'Accounting · onboarding', kind: 'accountant / fiduciary' }),
+      tx('2026-10-15', 'Proximus', 'utilities', -45, { description: 'Mobile & internet', kind: 'telecom' }),
+      tx('2026-10-09', 'Guichet d’entreprises UCM', 'business-admin', -95, {
+        description: 'Registration in the Crossroads Bank for Enterprises',
+        kind: 'enterprise counter · business registration',
+      }),
+      tx('2026-10-05', 'Savings account', 'savings', -300, { description: 'Monthly transfer to savings', kind: 'transfer to own savings account' }),
+      tx('2026-10-03', 'Edenred', 'meal-vouchers', 160, { description: 'Meal vouchers', kind: 'meal vouchers' }),
+      tx('2026-10-01', 'Résidence Meuse', 'housing', -820, { description: 'Rent', kind: RENT }),
+    ]),
+    month('11', [
+      tx('2026-11-27', 'Brasserie Sauvage', 'invoice-income', 2350, { description: 'Invoice 2026-004', kind: 'client transfer · invoice payment' }),
+      tx('2026-11-21', 'Maison Delvaux', 'invoice-income', 1800, { description: 'Invoice 2026-003', kind: 'client transfer · invoice payment' }),
+      tx('2026-11-18', 'Cameo Pro Namur', 'pro-equipment', -2190, {
+        description: 'Laptop & drawing tablet',
+        kind: 'professional IT & photo equipment store',
+      }),
+      tx('2026-11-16', 'Fiduciaire Collard', 'accounting', -150, { description: 'Accounting · monthly', kind: 'accountant / fiduciary' }),
+      tx('2026-11-15', 'Proximus', 'utilities', -45, { description: 'Mobile & internet', kind: 'telecom' }),
+      tx('2026-11-12', 'Atelier Moreau', 'invoice-income', 420, { description: 'Invoice 2026-002', kind: 'client transfer · invoice payment' }),
+      tx('2026-11-10', 'Caisse d’assurances sociales', 'business-admin', -780, {
+        description: 'Quarterly social contributions',
+        kind: 'social insurance fund for self-employed',
+      }),
+      tx('2026-11-04', 'Coworking Le Phare', 'pro-equipment', -180, { description: 'Monthly desk', kind: 'coworking space' }),
+      tx('2026-11-01', 'Résidence Meuse', 'housing', -820, { description: 'Rent', kind: RENT }),
+    ]),
+  ],
+};
+
+export const customers: Customer[] = [emma, lucasSarah, marc, julie];

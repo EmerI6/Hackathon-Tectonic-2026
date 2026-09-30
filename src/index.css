@@ -1711,3 +1711,137 @@ ol {
   background: var(--grey-100);
   color: var(--grey-600);
 }
+
+/* LLM interpretation, guardrails, learning loop */
+.status-chip.is-suppressed,
+.status-chip.is-idle {
+  background: var(--grey-100);
+  color: var(--grey-600);
+}
+
+.source-badge {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--grey-100);
+  color: var(--grey-600);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.source-badge.is-live {
+  background: var(--green-50);
+  color: var(--green);
+}
+
+.source-badge.is-fallback {
+  background: var(--amber-50);
+  color: #a86c00;
+}
+
+.signals li.llm-signal {
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 5px 12px;
+}
+
+.signals li.llm-signal strong {
+  font-size: 13px;
+}
+
+.llm-need {
+  color: var(--grey-600);
+}
+
+.sensitive-tag {
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--red-50);
+  color: var(--red);
+  font-weight: 700;
+}
+
+.guardrails ul {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 6px;
+}
+
+.guardrails li {
+  display: grid;
+  grid-template-columns: 16px auto minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  font-size: 12.5px;
+}
+
+.guardrails li.is-pass svg {
+  color: var(--green);
+}
+
+.guardrails li.is-fail svg {
+  color: var(--red);
+}
+
+.guardrails li.is-skip svg {
+  color: var(--grey-400);
+}
+
+.break-summary summary {
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.break-summary pre {
+  margin-top: 6px;
+  max-height: 220px;
+  overflow: auto;
+  font-size: 11px;
+  line-height: 1.4;
+  background: white;
+  border: 1px solid var(--grey-100);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.feedback-log {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.feedback-log ul {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.feedback-log li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  padding: 5px 10px;
+  border-radius: 10px;
+  background: var(--grey-50);
+  animation: moment-in 0.4s var(--ease);
+}
+
+.feedback-log li.is-dismissed {
+  background: var(--red-50);
+}
+
+.feedback-log li .muted {
+  margin-left: auto;
+}

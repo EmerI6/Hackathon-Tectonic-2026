@@ -36,7 +36,7 @@ export default function App() {
         content = (
           <MomentDetail
             moment={activeMoment}
-            signals={demo.detection?.signals ?? []}
+            signals={activeMoment?.signals ?? []}
             response={demo.response}
             onRespond={demo.respond}
             onBack={() => setScreen('home')}
@@ -59,7 +59,7 @@ export default function App() {
           KBC <span>Moments</span>
         </span>
         <span className="app-tagline">Life moment detector · Hackathon proof of concept</span>
-        <span className="app-header-badge">Demo mode · mock data</span>
+        <span className="app-header-badge">Demo · mock customers · Gemini + fallback</span>
       </header>
 
       <main className="stage">

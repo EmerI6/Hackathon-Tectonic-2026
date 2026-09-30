@@ -1,6 +1,7 @@
 import type { DemoState } from '../../hooks/useDemo';
 import { CustomerSelector } from './CustomerSelector';
 import { DetectionCard } from './DetectionCard';
+import { FeedbackLog } from './FeedbackLog';
 import { MonthTimeline } from './MonthTimeline';
 import { Pipeline } from './Pipeline';
 
@@ -44,6 +45,14 @@ export function DemoPanel({ demo }: { demo: DemoState }) {
           newTransactions={demo.newTxIds.size}
         />
         <DetectionCard detection={demo.detection} step={demo.pipelineStep} response={demo.response} />
+      </section>
+
+      <section className="panel-section">
+        <h2 className="panel-title">
+          <span className="step-num">4</span> Learning loop
+          <span className="panel-subtitle">Customer feedback · .data/feedback.json</span>
+        </h2>
+        <FeedbackLog entries={demo.feedback} onClear={demo.resetFeedback} />
       </section>
     </aside>
   );
