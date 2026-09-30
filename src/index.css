@@ -111,14 +111,14 @@ ol {
 .app {
   max-width: 1380px;
   margin: 0 auto;
-  padding: 18px 32px 24px;
+  padding: 14px 32px 20px;
 }
 
 .app-header {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .app-tagline {
@@ -181,7 +181,7 @@ ol {
 /* ------------------------------------------------------------------ */
 
 .phone {
-  --phone-h: min(800px, calc(100vh - 110px));
+  --phone-h: min(800px, calc(100vh - 100px));
   height: var(--phone-h);
   min-height: 620px;
   aspect-ratio: 9 / 18.5;
@@ -1197,18 +1197,18 @@ ol {
 .demo-panel {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   max-width: 760px;
 }
 
 .panel-section {
   background: var(--surface);
   border-radius: 20px;
-  padding: 18px 20px;
+  padding: 14px 18px;
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .panel-title {
@@ -1370,7 +1370,7 @@ ol {
 
 .pipeline-step {
   position: relative;
-  padding: 12px;
+  padding: 10px 12px;
   border-radius: 14px;
   background: var(--grey-50);
   border: 1.5px solid var(--grey-100);
@@ -1499,7 +1499,7 @@ ol {
 /* Detection card */
 .panel-card {
   border-radius: 16px;
-  padding: 16px;
+  padding: 12px 16px;
   background: var(--grey-50);
   border: 1.5px solid var(--grey-100);
 }
@@ -1507,7 +1507,7 @@ ol {
 .detection {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
   animation: moment-in 0.5s var(--ease);
 }
 
@@ -1578,11 +1578,11 @@ ol {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .confidence-value {
-  font-size: 30px;
+  font-size: 26px;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--amber);
@@ -1598,7 +1598,7 @@ ol {
   height: 12px;
   border-radius: 999px;
   background: var(--grey-100);
-  margin-bottom: 22px;
+  margin-bottom: 18px;
 }
 
 .confidence-fill {
@@ -1634,8 +1634,8 @@ ol {
 .signals ul {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 6px;
+  margin-top: 6px;
 }
 
 .signals li {
@@ -1643,8 +1643,8 @@ ol {
   grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 44px;
   gap: 14px;
   align-items: center;
-  padding: 10px 12px;
-  border-radius: 12px;
+  padding: 6px 12px;
+  border-radius: 10px;
   background: white;
   border: 1px solid var(--grey-100);
   animation: tx-in 0.5s var(--ease) both;
