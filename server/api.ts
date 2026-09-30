@@ -26,6 +26,14 @@ interface Options {
   feedbackFile?: string;
 }
 
+class HttpError extends Error {
+  status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.status = status;
+  }
+}
+
 function readBody(req: IncomingMessage): Promise<unknown> {
   return new Promise((ok, fail) => {
     let raw = '';
@@ -87,7 +95,12 @@ export function kbcApi({ apiKey, model = DEFAULT_GEMINI_MODEL, feedbackFile = '.
       fallbackReason = 'No GEMINI_API_KEY on the server';
     }
     if (source === 'fallback') {
-      candidates = sanitizeCandidates((fixtures as Record<string, unknown>)[body.demoKey]);
+      const fixtureKey = body.fixtureKey ?? body.demoKey;
+      if (body.mode === 'live') {
+        if (!body.allowFallback) throw new HttpError(apiKey ? 502 : 503, fallbackReason ?? 'Gemini unavailable');
+        fallbackReason = `${fallbackReason} · PRE-RECORDED answer of closest demo profile (${fixtureKey}), not a live analysis`;
+      }
+      candidates = sanitizeCandidates((fixtures as Record<string, unknown>)[fixtureKey]);
     }
     return {
       source,
@@ -118,7 +131,7 @@ export function kbcApi({ apiKey, model = DEFAULT_GEMINI_MODEL, feedbackFile = '.
       }
       next();
     } catch (e) {
-      send(res, 400, { error: (e as Error).message });
+      send(res, e instanceof HttpError ? e.status : 400, { error: (e as Error).message });
     }
   };
 

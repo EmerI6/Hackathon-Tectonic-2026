@@ -1,0 +1,67 @@
+date,description,amount,category,type
+2026-04-01,Résidence Meuse · Rent,-820,housing,expense
+2026-04-02,TEC · Monthly bus pass,-42,transport,expense
+2026-04-03,Edenred · Meal vouchers,160,meal-vouchers,income
+2026-04-05,Savings account · Monthly transfer to savings,-300,savings,expense
+2026-04-15,Proximus · Mobile & internet,-45,utilities,expense
+2026-04-20,Le Comptoir,-24,restaurant,expense
+2026-04-25,Delhaize Namur,-82.4,groceries,expense
+2026-04-28,Studio Pixel SRL · Salary,2600,salary,income
+2026-05-01,Résidence Meuse · Rent,-820,housing,expense
+2026-05-02,TEC · Monthly bus pass,-42,transport,expense
+2026-05-03,Edenred · Meal vouchers,160,meal-vouchers,income
+2026-05-05,Savings account · Monthly transfer to savings,-300,savings,expense
+2026-05-15,Proximus · Mobile & internet,-45,utilities,expense
+2026-05-20,Le Comptoir,-24,restaurant,expense
+2026-05-25,Delhaize Namur,-82.4,groceries,expense
+2026-05-28,Studio Pixel SRL · Salary,2600,salary,income
+2026-06-01,Résidence Meuse · Rent,-820,housing,expense
+2026-06-02,TEC · Monthly bus pass,-42,transport,expense
+2026-06-03,Edenred · Meal vouchers,160,meal-vouchers,income
+2026-06-05,Savings account · Monthly transfer to savings,-300,savings,expense
+2026-06-15,Proximus · Mobile & internet,-45,utilities,expense
+2026-06-20,Le Comptoir,-24,restaurant,expense
+2026-06-25,Delhaize Namur,-82.4,groceries,expense
+2026-06-28,Studio Pixel SRL · Salary,2600,salary,income
+2026-07-01,Résidence Meuse · Rent,-820,housing,expense
+2026-07-02,TEC · Monthly bus pass,-42,transport,expense
+2026-07-03,Edenred · Meal vouchers,160,meal-vouchers,income
+2026-07-05,Savings account · Monthly transfer to savings,-300,savings,expense
+2026-07-15,Proximus · Mobile & internet,-45,utilities,expense
+2026-07-20,Le Comptoir,-24,restaurant,expense
+2026-07-25,Delhaize Namur,-82.4,groceries,expense
+2026-07-28,Studio Pixel SRL · Salary,2600,salary,income
+2026-08-01,Résidence Meuse · Rent,-820,housing,expense
+2026-08-02,TEC · Monthly bus pass,-42,transport,expense
+2026-08-03,Edenred · Meal vouchers,160,meal-vouchers,income
+2026-08-05,Savings account · Monthly transfer to savings,-300,savings,expense
+2026-08-15,Proximus · Mobile & internet,-45,utilities,expense
+2026-08-20,Le Comptoir,-24,restaurant,expense
+2026-08-25,Delhaize Namur,-82.4,groceries,expense
+2026-08-28,Studio Pixel SRL · Salary,2600,salary,income
+2026-09-01,Résidence Meuse · Rent,-820,housing,expense
+2026-09-02,TEC · Monthly bus pass,-42,transport,expense
+2026-09-03,Edenred · Meal vouchers,160,meal-vouchers,income
+2026-09-05,Savings account · Monthly transfer to savings,-300,savings,expense
+2026-09-15,Proximus · Mobile & internet,-45,utilities,expense
+2026-09-20,Le Comptoir,-24,restaurant,expense
+2026-09-25,Delhaize Namur,-82.4,groceries,expense
+2026-09-28,Studio Pixel SRL · Salary,2600,salary,income
+2026-10-01,Résidence Meuse · Rent,-820,housing,expense
+2026-10-03,Edenred · Meal vouchers,160,meal-vouchers,income
+2026-10-05,Savings account · Monthly transfer to savings,-300,savings,expense
+2026-10-09,Guichet d’entreprises UCM · Registration in the Crossroads Bank for Enterprises,-95,business-admin,expense
+2026-10-15,Proximus · Mobile & internet,-45,utilities,expense
+2026-10-16,Fiduciaire Collard · Accounting · onboarding,-150,accounting,expense
+2026-10-22,Delhaize Namur,-79.9,groceries,expense
+2026-10-24,Atelier Moreau · Invoice 2026-001,650,invoice-income,income
+2026-10-28,Studio Pixel SRL · Salary,2600,salary,income
+2026-11-01,Résidence Meuse · Rent,-820,housing,expense
+2026-11-04,Coworking Le Phare · Monthly desk,-180,pro-equipment,expense
+2026-11-10,Caisse d’assurances sociales · Quarterly social contributions,-780,business-admin,expense
+2026-11-12,Atelier Moreau · Invoice 2026-002,420,invoice-income,income
+2026-11-15,Proximus · Mobile & internet,-45,utilities,expense
+2026-11-16,Fiduciaire Collard · Accounting · monthly,-150,accounting,expense
+2026-11-18,Cameo Pro Namur · Laptop & drawing tablet,-2190,pro-equipment,expense
+2026-11-21,Maison Delvaux · Invoice 2026-003,1800,invoice-income,income
+2026-11-27,Brasserie Sauvage · Invoice 2026-004,2350,invoice-income,income
